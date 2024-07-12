@@ -9,8 +9,26 @@ from . import util
 
 
 def index(request):
+    if request.method == "POST":
+        entries = []
+        items = util.list_entries()
+        for item in items:
+            if item.lower() == request.POST["q"].lower():
+                return HttpResponseRedirect(f"wiki/{item}")
+            print(item)
+            print()
+            print(item.lower().find(request.POST['q'].lower()) != -1)
+            if item.lower().find(request.POST['q'].lower()) != -1:
+                entries.append(item)
+
+            print("=======")
+        return render(request, "encyclopedia/index.html", {
+            "entries": entries,
+            "search": True,
+        })
     return render(request, "encyclopedia/index.html", {
-        "entries": util.list_entries()
+        "entries": util.list_entries(),
+        "search": False,
     })
 
 def page(request, page):   
@@ -30,3 +48,4 @@ def random(request):
     total = len(pages)
     number = floor(ran.random() * total)
     return HttpResponseRedirect(f"/wiki/{pages[number]}")
+
