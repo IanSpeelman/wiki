@@ -1,6 +1,9 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from markdown2 import Markdown
 markdowner = Markdown()
+import random as ran
+from math import floor
 
 from . import util
 
@@ -21,3 +24,9 @@ def page(request, page):
         return render(request, "encyclopedia/page.html",{
             "pagecontent": f"<h1>'{page}' does not exist!</h1>",
         })
+
+def random(request):
+    pages = util.list_entries()
+    total = len(pages)
+    number = floor(ran.random() * total)
+    return HttpResponseRedirect(f"/wiki/{pages[number]}")
