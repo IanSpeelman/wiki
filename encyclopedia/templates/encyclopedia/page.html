@@ -3,6 +3,8 @@
 Encyclopedia 
 {%endblock %}
 {% block body %} 
-<a href="{% url 'wiki:edit' title %}">edit</a>
-{{ pagecontent|safe }} 
+{% if title %}
+    <a href="{% url 'wiki:edit' title %}">edit</a>
+{% endif %}
+    {{ pagecontent|safe }} 
 {% endblock %}

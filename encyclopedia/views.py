@@ -13,7 +13,7 @@ class EditForm(forms.Form):
     title = forms.CharField(widget = forms.HiddenInput())
     content = forms.CharField(widget=forms.Textarea())
 
-from . import util
+from . import util, myutil
 
 
 def index(request):
@@ -39,7 +39,7 @@ def page(request, page):
     md = util.get_entry(page)
     if not md == None:
         content = {
-            "pagecontent": markdowner.convert(md),
+            "pagecontent": myutil.convertToHtml(md),
             "title": page
         }
         try:
@@ -52,6 +52,7 @@ def page(request, page):
 
         except:
             pass
+        myutil.convertToHtml(md)
         return render(request, "encyclopedia/page.html",content)
     else:
         return render(request, "encyclopedia/page.html",{
@@ -95,10 +96,13 @@ def new(request):
 
 def edit(request, page):
     if request.method == "POST":
-        title = request.POST["title"]
-        content = request.POST["content"]
-        util.save_entry(title, content)
-        return HttpResponseRedirect(f"/wiki/{title}?success=edit")
+        form = NewEntryForm(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data["content"].encode()
+            title = form.cleaned_data["title"]
+            print(request.POST["title"])
+            util.save_entry(title, content)
+            return HttpResponseRedirect(f"/wiki/{title}?success=edit")
     content = util.get_entry(page)
     return render(request, "encyclopedia/form.html",{
                 "new": False,
