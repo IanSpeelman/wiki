@@ -52,7 +52,6 @@ def page(request, page):
 
         except:
             pass
-        myutil.convertToHtml(md)
         return render(request, "encyclopedia/page.html",content)
     else:
         return render(request, "encyclopedia/page.html",{

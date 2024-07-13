@@ -4,7 +4,7 @@ def convertToHtml(content):
     lines = content.splitlines()
     result = ""
     for line in lines:
-        result += f"{links(headers(line))}"
+        result += f"{links(bold(headers(line)))}"
     return result
 
 def headers(line):
@@ -39,6 +39,7 @@ def links(line):
         link = []
         for i in range(len(result)):
             if i % 4 == 1:
+
                 link.append(result[i])
             elif i % 4 == 3:
                 link.append(result[i])
@@ -51,3 +52,14 @@ def links(line):
         return f"<p>{string}</p>"   
     else:
         return f'{string}'
+    
+def bold(line):
+    boldresult = re.split("\*\*", line)
+    string = ""
+    if len(boldresult) > 1:
+        for i in range(len(boldresult)):
+            if i % 2 == 1:
+                string += f"<b>{boldresult[i]}</b>"
+            else:
+                string += boldresult[i]
+    return string
