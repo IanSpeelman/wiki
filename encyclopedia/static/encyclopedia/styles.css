@@ -36,3 +36,13 @@ textarea {
 .sidebar h2 {
     margin-top: 5px;
 }
+.message{
+    width: 100%;
+    padding: 1em 2em;
+ }
+ .error{
+     background-color: rgba(255,0,0,.2);
+ }
+ .success{
+     background-color: rgba(0,255,0,.2);
+ }
