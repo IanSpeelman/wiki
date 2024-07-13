@@ -9,6 +9,9 @@ from math import floor
 class NewEntryForm(forms.Form):
     title = forms.CharField(label="Title")
     content = forms.CharField(widget=forms.Textarea(attrs={"rows": "5", "cols":"5"}))
+class EditForm(forms.Form):
+    title = forms.CharField(widget = forms.HiddenInput())
+    content = forms.CharField(widget=forms.Textarea())
 
 from . import util
 
@@ -20,13 +23,9 @@ def index(request):
         for item in items:
             if item.lower() == request.POST["q"].lower():
                 return HttpResponseRedirect(f"wiki/{item}")
-            print(item)
-            print()
             print(item.lower().find(request.POST['q'].lower()) != -1)
             if item.lower().find(request.POST['q'].lower()) != -1:
                 entries.append(item)
-
-            print("=======")
         return render(request, "encyclopedia/index.html", {
             "entries": entries,
             "search": True,
@@ -40,12 +39,17 @@ def page(request, page):
     md = util.get_entry(page)
     if not md == None:
         content = {
-            "pagecontent": markdowner.convert(md)
+            "pagecontent": markdowner.convert(md),
+            "title": page
         }
         try:
-            if request.GET["success"]:
+            if request.GET["success"] == "create":
                 content["type"] = "success"
                 content["message"] = "new entry added successfully"
+            elif request.GET["success"] == "edit":
+                content["type"] = "success"
+                content["message"] = "entry edited successfully"
+
         except:
             pass
         return render(request, "encyclopedia/page.html",content)
@@ -68,20 +72,36 @@ def new(request):
             print(data)
             if not util.get_entry(data["title"].capitalize()):
                 util.save_entry(data["title"].capitalize(), data["content"])
-                return HttpResponseRedirect(f"/wiki/{data["title"]}?success=true")
+                return HttpResponseRedirect(f"/wiki/{data["title"]}?success=create")
             else:
-                return render(request, "encyclopedia/new.html", {
+                return render(request, "encyclopedia/form.html", {
+                    "new":True,
                     "type": "error",
                     "message": "this page already exists, please edit the original form, or use a different title",
                     "form":form,
                 })
         else:
-            return render(request, "encyclopedia/new.html", {
+            return render(request, "encyclopedia/form.html", {
+                "new":True,
                 "type": "error",
                 "message": "form data is not valid",
                 "form":form,
             })
 
-    return render(request, "encyclopedia/new.html", {
+    return render(request, "encyclopedia/form.html", {
+        "new":True,
         "form":NewEntryForm,
+    })
+
+def edit(request, page):
+    if request.method == "POST":
+        title = request.POST["title"]
+        content = request.POST["content"]
+        util.save_entry(title, content)
+        return HttpResponseRedirect(f"/wiki/{title}?success=edit")
+    content = util.get_entry(page)
+    return render(request, "encyclopedia/form.html",{
+                "new": False,
+                "title": page,
+                "form": EditForm({"title": page, "content": content}) 
     })

@@ -1,8 +1,9 @@
 {% extends "encyclopedia/layout.html" %} {% block title %} Encyclopedia
-{%endblock %} {% block body %}
-
+{%endblock %} {% block body %} {% if new %}
 <h1>Add New Entry</h1>
-
+{% else %}
+<h1>edit {{title}}</h1>
+{% endif %}
 
 <form
 	action=""
